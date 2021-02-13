@@ -19,44 +19,78 @@ public class WanderingAI : MonoBehaviour
   {
     if (!_alive) return;
 
-    MoveLogic();
-    ShootFireballToPlayer();
+    CheckRay();
   }
 
-  private void ShootFireballToPlayer()
+  private void ShootFireballToPlayer(RaycastHit hit)
   {
-    Ray ray = new Ray(transform.position, transform.forward);
-    RaycastHit hit;
-
-    if (Physics.SphereCast(ray, 0.75f, out hit))
+    GameObject hitObject = hit.transform.gameObject;
+    if (_fireball == null)
     {
-      GameObject hitObject = hit.transform.gameObject;
-      if (hitObject.tag == "Player" && _fireball == null)
-      {
-        _fireball = Instantiate(fireballPrefab);
-        Fireball fireball = _fireball.transform.GetComponent<Fireball>();
+      // если луч пересекся с персонаже, то создаем шар и стреляем
+      // по направлению персонажа
+      _fireball = Instantiate(fireballPrefab);
+      Fireball fireball = _fireball.transform.GetComponent<Fireball>();
 
-        fireball.SetDirection(
-          transform.TransformPoint(Vector3.forward * 1.5f),
-          transform.rotation
-        );
+      fireball.SetDirection(
+        transform.TransformPoint(Vector3.forward * 1.5f),
+        transform.rotation
+      );
 
-      }
     }
   }
 
-  private void MoveLogic()
+  // Уворачиваемся от столкновения с пердметами
+  private void collisionAvoidance(RaycastHit hit)
   {
-    Ray ray = new Ray(transform.position, transform.forward);
-    RaycastHit hit;
-
-    transform.Translate(0, 0, speed * Time.deltaTime);
-
-    if (Physics.SphereCast(ray, 0.75f, out hit, obstacleRange))
+    if (hit.distance <= obstacleRange)
     {
       float angle = Random.Range(-110, 100);
 
       transform.Rotate(0, angle, 0);
+    }
+  }
+
+  // логика слежения за персонажем
+  private void FollowCharacter(RaycastHit hit)
+  {
+    if (hit.distance <= 15)
+    {
+      MoveLogic(hit.distance > 2 ? speed : 0);
+      transform.LookAt(hit.transform);
+    }
+  }
+
+  // перемещаем врага
+  private void MoveLogic(float _speed)
+  {
+    transform.Translate(0, 0, _speed * Time.deltaTime);
+  }
+
+  private void CheckRay()
+  {
+    //создаем луч
+    Ray ray = new Ray(transform.position, transform.forward);
+    //создаем структуру с данными о пересеченном объекте
+    RaycastHit hit;
+
+    //пускаем луч-сферу вперед
+    if (Physics.SphereCast(ray, 0.75f, out hit))
+    {
+      GameObject hitObject = hit.transform.gameObject;
+
+      switch (hitObject.tag)
+      {
+        case "Player":
+          FollowCharacter(hit);
+          ShootFireballToPlayer(hit);
+          break;
+
+        default:
+          MoveLogic(speed);
+          collisionAvoidance(hit);
+          break;
+      }
     }
   }
 

@@ -12,6 +12,7 @@ public class Fireball : MonoBehaviour
     transform.Translate(0, 0, speed * Time.deltaTime);
   }
 
+  // Event срабатывающий при соприкосновении с другим объектом
   void OnTriggerEnter(Collider collider)
   {
     string tag = collider.tag;
@@ -31,6 +32,7 @@ public class Fireball : MonoBehaviour
     }
   }
 
+  // задаём точку спавна и направление полета шара
   public void SetDirection(Vector3 spawnPos, Quaternion rotationToTarget)
   {
     transform.position = spawnPos;

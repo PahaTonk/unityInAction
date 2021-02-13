@@ -11,6 +11,7 @@ public class SceneController : MonoBehaviour
   {
     if (_enemy != null) return;
 
+    // создаем врага после смерти предыдущего
     _enemy = Instantiate(enemyPrefab);
     float randomAngle = Random.Range(0, 360);
 

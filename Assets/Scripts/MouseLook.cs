@@ -27,7 +27,6 @@ public class MouseLook : MonoBehaviour
 
     if (body != null)
     {
-      print("asda");
       body.freezeRotation = true;
     }
   }
@@ -57,7 +56,9 @@ public class MouseLook : MonoBehaviour
   //верх/низ
   void countRotationX()
   {
+    // вычисляем перемещения курсора на экране
     _rotationX -= Input.GetAxis("Mouse Y") * sensitivityVer;
+    // ограничиваем поворот персонажа
     _rotationX = Mathf.Clamp(_rotationX, minimumVert, maximumVert);
   }
 

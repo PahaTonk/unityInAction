@@ -11,13 +11,18 @@ public class ReactiveTarget : MonoBehaviour
   {
     _enemy = GetComponent<WanderingAI>();
   }
+
+  // нанесение урона врагу
   public void ReactToHit()
   {
     if (!_enemy.getAlive()) return;
     _enemy.SetAlive(false);
+    // компонент нужен для падения
+    gameObject.AddComponent<Rigidbody>();
     StartCoroutine(Die());
   }
 
+  // метод убийства врага
   private IEnumerator Die()
   {
     transform.Rotate(-75, 0, 0);
